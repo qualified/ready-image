@@ -1,0 +1,28 @@
+# Use envsubst to set `IMAGE` and `SLEEPER_IMAGE`
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: readyimage-controller
+  namespace: default
+  labels:
+    app: readyimage-controller
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: readyimage-controller
+  template:
+    metadata:
+      labels:
+        app: readyimage-controller
+    spec:
+      serviceAccountName: readyimage-controller
+      containers:
+        - name: readyimage-controller
+          image: "${IMAGE}"
+          env:
+            - name: SLEEPER_IMAGE
+              value: "${SLEEPER_IMAGE}"
+            - name: RUST_LOG
+              value: "info,ready_image=trace"

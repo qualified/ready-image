@@ -1,0 +1,56 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: readyimages.qualified.io
+spec:
+  group: qualified.io
+  names:
+    categories: []
+    kind: ReadyImage
+    plural: readyimages
+    shortNames:
+      - rimg
+      - rimgs
+    singular: readyimage
+  scope: Namespaced
+  versions:
+    - additionalPrinterColumns: []
+      name: v1alpha1
+      schema:
+        openAPIV3Schema:
+          description: "Auto-generated derived type for ReadyImageSpec via `CustomResource`"
+          properties:
+            spec:
+              properties:
+                image:
+                  description: The container image to keep ready on nodes.
+                  type: string
+                imagePullSecrets:
+                  description: Optional list of references to secrets to use for pulling the container image. Secrets must be in the same namespace as the controller because Pods are created there.
+                  items:
+                    description: LocalObjectReference contains enough information to let you locate the referenced object inside the same namespace.
+                    properties:
+                      name:
+                        description: "Name of the referent. More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names"
+                        type: string
+                    type: object
+                  nullable: true
+                  type: array
+                nodeSelector:
+                  additionalProperties:
+                    type: string
+                  description: Optional node selector to select the nodes to keep the image ready. Defaults to all nodes.
+                  nullable: true
+                  type: object
+              required:
+                - image
+              type: object
+          required:
+            - spec
+          title: ReadyImage
+          type: object
+      served: true
+      storage: true
+      subresources: {}
+

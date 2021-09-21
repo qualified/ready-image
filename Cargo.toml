@@ -1,0 +1,23 @@
+[package]
+name = "ready-image"
+version = "0.1.0"
+authors = ["kazk <kazk.dev@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+either = "1.6.1"
+futures = "0.3.17"
+k8s-openapi = { version = "0.13.0", default-features = false, features = ["v1_20", "schemars"] }
+kube = { version = "0.60.0", features = ["derive"] }
+kube-runtime = "0.60.0"
+schemars = "0.8.3"
+serde = { version = "1.0.130", features = ["derive"] }
+serde_json = "1.0.68"
+serde_yaml = "0.8.21"
+snafu = "0.6.10"
+tokio = { version = "1.11.0", features = ["macros", "rt-multi-thread"] }
+tracing = "0.1.28"
+tracing-subscriber = "0.2.23"
+
+[profile.release]
+lto = true

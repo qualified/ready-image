@@ -1,0 +1,54 @@
+name: Images
+
+on:
+  push:
+    branches: [main]
+    # Only when these paths changed
+    paths:
+      - ".github/workflows/images.yaml"
+      - "src/**"
+      - "Cargo.toml"
+      - "Cargo.lock"
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push-images:
+    if: ${{ github.repository == 'qualified/ready-image' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push sleeper image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: k8s/sleeper/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/readyimage-sleeper:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push controller image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: k8s/controller/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/readyimage-controller:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

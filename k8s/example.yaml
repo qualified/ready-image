@@ -1,0 +1,7 @@
+kind: ReadyImage
+apiVersion: qualified.io/v1alpha1
+metadata:
+  name: "example"
+  namespace: default
+spec:
+  image: "busybox:1-musl"
