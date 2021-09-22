@@ -197,7 +197,7 @@ fn build_daemon_set(rimg: &ReadyImage, sleeper_image: &str) -> DaemonSet {
         metadata: ObjectMeta {
             // Generate a unique name with prefix
             name: None,
-            generate_name: rimg.metadata.name.clone(),
+            generate_name: Some(format!("{}-", rimg.name())),
             labels: Some(labels.clone()),
             owner_references: Some(vec![to_owner_reference(rimg)]),
             ..ObjectMeta::default()
