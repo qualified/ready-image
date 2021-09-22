@@ -68,7 +68,10 @@ async fn reconciler(rimg: ReadyImage, ctx: Context<ContextData>) -> Result<Recon
     let version = rimg.resource_version().expect("resource version set");
     let list = daemons
         .list(&ListParams {
-            label_selector: Some(format!("controller={},version={}", &uid, &version)),
+            label_selector: Some(format!(
+                "{}={},{}={}",
+                LABEL_CONTROLLER, &uid, LABEL_VERSION, &version
+            )),
             ..ListParams::default()
         })
         .await
@@ -96,8 +99,10 @@ async fn reconciler(rimg: ReadyImage, ctx: Context<ContextData>) -> Result<Recon
         _ => {
             // something caused multiple `DaemonSet` to exist, remove except one.
             tracing::warn!(
-                "multiple DaemonSet found for controller={},version={}",
+                "multiple DaemonSet found for {}={},{}={}",
+                LABEL_CONTROLLER,
                 &uid,
+                LABEL_VERSION,
                 &version
             );
             let mut dss = list.items.iter();
@@ -137,7 +142,10 @@ async fn reconciler(rimg: ReadyImage, ctx: Context<ContextData>) -> Result<Recon
                 ..DeleteParams::default()
             },
             &ListParams {
-                label_selector: Some(format!("controller={},version!={}", &uid, &version)),
+                label_selector: Some(format!(
+                    "{}={},{}!={}",
+                    LABEL_CONTROLLER, &uid, LABEL_VERSION, &version
+                )),
                 ..ListParams::default()
             },
         )
@@ -264,11 +272,16 @@ fn build_daemon_set(rimg: &ReadyImage, sleeper_image: &str) -> DaemonSet {
     }
 }
 
-// TODO Prefix labels
+const LABEL_CONTROLLER: &str = "readyimage/controller";
+const LABEL_VERSION: &str = "readyimage/version";
+
 fn make_labels(rimg: &ReadyImage) -> BTreeMap<String, String> {
     vec![
-        ("controller", rimg.uid().expect(".metadata.uid")),
-        ("version", rimg.resource_version().expect("resource_ver")),
+        (LABEL_CONTROLLER, rimg.uid().expect(".metadata.uid")),
+        (
+            LABEL_VERSION,
+            rimg.resource_version().expect("resource_ver"),
+        ),
     ]
     .into_iter()
     .map(|(k, v)| (k.to_owned(), v))
