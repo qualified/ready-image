@@ -258,6 +258,17 @@ fn build_daemon_set(rimg: &ReadyImage, sleeper_image: &str) -> DaemonSet {
                             mount_path: "/drop/".into(),
                             ..VolumeMount::default()
                         }]),
+                        resources: Some(ResourceRequirements {
+                            limits: Some(
+                                vec![
+                                    ("cpu".to_owned(), Quantity("1m".into())),
+                                    ("memory".to_owned(), Quantity("20M".into())),
+                                ]
+                                .into_iter()
+                                .collect::<BTreeMap<_, _>>(),
+                            ),
+                            ..ResourceRequirements::default()
+                        }),
                         ..Container::default()
                     }],
                     image_pull_secrets: rimg.spec.image_pull_secrets.clone(),
