@@ -274,6 +274,7 @@ fn build_daemon_set(rimg: &ReadyImage, sleeper_image: &str) -> DaemonSet {
                     image_pull_secrets: rimg.spec.image_pull_secrets.clone(),
                     volumes: Some(vec![volume]),
                     node_selector: rimg.spec.node_selector.clone(),
+                    termination_grace_period_seconds: Some(0),
                     ..PodSpec::default()
                 }),
             },
